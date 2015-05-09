@@ -1,0 +1,48 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          enso
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: enso
+# Description:       enso circular LED system
+### END INIT INFO
+set -e
+
+# Must be a valid filename
+NAME=enso
+PIDFILE=/var/run/$NAME.pid
+#This is the command to be run, give the full pathname
+ROOT="/srv/enso"
+DAEMON=$ROOT/venv/bin/python
+DAEMON_OPTS="enso.py --settings=settings.dreamcatcher-cool"
+
+export PATH="${PATH:+$PATH:}/srv/enso/venv/bin"
+
+. $ROOT/venv/bin/activate
+
+case "$1" in
+  start)
+        echo -n "Starting enso: "$NAME
+        start-stop-daemon --make-pidfile --background --start --pidfile $PIDFILE -d $ROOT --exec $DAEMON -- $DAEMON_OPTS
+        echo "."
+        ;;
+  stop)
+        echo -n "Stopping enso: "$NAME
+        start-stop-daemon --signal INT --stop --oknodo --pidfile $PIDFILE
+        echo "."
+        ;;
+  restart)
+        echo -n "Restarting enso: "$NAME
+        start-stop-daemon --signal INT --stop --oknodo --pidfile $PIDFILE --retry 30
+        start-stop-daemon --make-pidfile --background --start --pidfile $PIDFILE -d $ROOT --exec $DAEMON -- $DAEMON_OPTS
+        echo "."
+        ;;
+
+  *)
+        echo "Usage: "$1" {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
