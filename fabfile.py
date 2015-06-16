@@ -42,6 +42,23 @@ def dreamcatcher_warm():
 
 
 @task
+def lhc():
+    env.run = run
+    env.cd = cd
+    env.user = 'pi'
+    env.name = 'lhc'
+    env.hosts = ['lhc.local']
+    env.path = '/srv/enso/'
+    env.project = 'enso'
+    env.virtualenv = 'virtualenv'
+    env.environment = env.path + 'venv'
+    env.warn_only = True
+    env.python = 'source {0}venv/bin/activate && python'.format(env.path)
+    env.pip = 'source {0}venv/bin/activate && pip'.format(env.path)
+    env.restart = ('sudo /etc/init.d/enso stop', 'sudo /etc/init.d/enso start')
+
+
+@task
 def bootstrap():
     upload()
     env.cd(env.path)
@@ -63,6 +80,7 @@ def upload():
         exclude=(
             '.git',
             'venv*/',
+            '/venv2/'
             'fabfile.py',
             '*.pyc',
             '*.pyo'))
